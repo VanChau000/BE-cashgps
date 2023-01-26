@@ -1,0 +1,46 @@
+# fly.toml file generated for cashgps-staging on 2022-09-22T15:54:17+07:00
+
+app = "cashgps-staging"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+  PORT = 8081
+  SERVER_URL = "https://cashgps-staging.fly.dev"
+  CLIENT_URL = "https://cashgps.fly.dev"
+  AWS_SENDER_EMAIL = "noreply@cashgps.co"
+  STRIPE_PK = "pk_test_51M4zYZCxwaFqJ7ikeAf4IPGbmmnzFGoZSXR8ZDdABR7ohdH56ixibWVNhgMia8zU21nZ30hKQl26xkPYLm2pWG7e00wfpSofzp"
+  STRIPE_SK = "sk_test_51M4zYZCxwaFqJ7ikt4yoslpvH9q5gwC66tRVEv5asNq66J8DG5okZ82wLdlJjMASS5vRD6CWFhXTiIGV9OnngUOe00K03L4rME"
+  STRIPE_WEBHOOK_SECRET = "whsec_pdhJdbgGA1yCCORevicEV0d43SsfgWdn"
+  EXCHANGE_RATES_API = "https://api.exchangerate-api.com/v4/latest/USD"
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  http_checks = []
+  internal_port = 8081
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"

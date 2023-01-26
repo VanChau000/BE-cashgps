@@ -1,0 +1,473 @@
+# enum
+enum OrderType {
+  UP
+  DOWN
+}
+
+enum GroupType {
+  IN
+  OUT
+}
+
+enum DisplayMode {
+  USED
+  ARCHIVED
+}
+
+enum FrequencyType {
+  MONTHLY
+  DAILY
+  WEEKLY
+  ANNUALLY
+}
+
+enum Recurring {
+  MONTHLY
+  YEARLY
+}
+
+enum Permission {
+  VIEW
+  EDIT
+}
+
+# input
+input UpdatePasswordInput {
+  currentPassword: String
+  newPassword: String
+  newPasswordConfirm: String
+}
+
+input UpsertCashProjectArgs {
+  name: String
+  startingBalance: Float
+  timezone: String
+  currency: String
+  startDate: String
+  weekSchedule: Int
+}
+
+input UpsertCashProjectInput {
+  projectId: String
+  upsertArgs: UpsertCashProjectArgs
+  saturdayOrSunday: [Boolean]
+}
+
+input UpsertCashGroupArgs {
+  name: String
+  groupType: GroupType
+  displayMode: DisplayMode
+}
+
+input UpsertCashGroupInput {
+  projectId: String
+  groupId: String
+  orderType: OrderType
+  upsertArgs: UpsertCashGroupArgs
+}
+
+input ListGroupsByTypeInput {
+  projectId: String
+  groupType: GroupType
+}
+
+input UpsertEntryRowArgs {
+  cashGroupId: String
+  name: String
+  displayMode: DisplayMode
+}
+
+input UpsertCashEntryRowInput {
+  projectId: String
+  orderType: OrderType
+  cashEntryRowId: String
+  upsertArgs: UpsertEntryRowArgs
+}
+
+input ListEntryRowInGroupInput {
+  projectId: String
+  cashGroupId: String
+}
+
+input DeleteCashEntryRowInput {
+  id: String
+  projectId: String
+}
+
+input DeleteCashGroupInput {
+  id: String
+  projectId: String
+}
+
+input DeleteCashTransactionInput {
+  id: String
+  projectId: String
+}
+
+input UpsertCashTransactionArgs {
+  cashEntryRowId: String
+  description: String
+  transactionDate: String
+  estimatedValue: Float
+  value: Float
+  frequency: FrequencyType
+  frequencyStopAt: String
+}
+
+input TransactionInputCreation {
+  cashTransactionId: String
+  upsertArgs: UpsertCashTransactionArgs
+}
+
+input UpsertCashTransactionInput {
+  projectId: String
+  transactions: [TransactionInputCreation]
+}
+
+input GetAllTransactionsInRowInDayArgs {
+  cashEntryRowId: String
+  transactionDate: String
+}
+
+input IdAndEmailInput {
+  id: String
+  email: String
+}
+
+input InvitationInput {
+  emails: [IdAndEmailInput]
+  projectId: String
+  permission: Permission
+}
+
+input SharingInput {
+  projectId: String
+  userId: String
+  permission: Permission
+}
+
+input UserIdAndProjectId {
+  authorizedUserId: String
+  projectId: String
+}
+
+input WatchProjectInput {
+  projectId: String
+  ownerId: String
+  permission: Permission
+}
+
+# type
+type User {
+  id: String
+  email: String
+  googleId: String
+  customerId: String
+  lastName: String
+  firstName: String
+  timezone: String
+  currency: String
+  isEmailVerified: Boolean
+  activeSubscription: String
+  subscriptionExpiresAt: String
+}
+
+type GetUser {
+  user: User
+  hasProject: Boolean
+}
+
+type SignupResult {
+  id: String
+  email: String
+  lastName: String
+  firstName: String
+  googleId: String
+}
+
+type LoginResult {
+  accessToken: String
+  refreshToken: String
+  userId: String
+  email: String
+}
+
+type UpdateProfileResult {
+  id: String
+  email: String
+  firstName: String
+  lastName: String
+  timezone: String
+  currency: String
+  activeSubscription: String
+  subscriptionExpiresAt: String
+}
+
+type DeletedInfo {
+  messageOfDeletion: String
+}
+
+type UpsertResult {
+  result: String
+}
+
+type MessageWhenChangePassword {
+  message: String
+}
+
+type ResultOfDragDrop {
+  resultOfDragDrop: String
+}
+
+type CashProject {
+  id: String
+  ownerId: String
+  name: String
+  startingBalance: Float
+  timezone: String
+  currency: String
+  initialCashFlow: String
+  startDate: String
+  weekSchedule: Int
+}
+
+type Transaction {
+  id: String
+  cashEntryRowId: String
+  cashGroupId: String
+  projectId: String
+  ownerId: String
+  displayMode: DisplayMode
+  transactionDate: String
+  description: String
+  estimatedValue: Float
+  value: Float
+  frequency: FrequencyType
+  frequencyStopAt: String
+  parentId: String
+}
+
+type TransactionsByDay {
+  transactionDate: String
+  transactions: [Transaction]
+}
+
+type CashEntryRow {
+  id: String
+  projectId: String
+  ownerId: String
+  cashGroupId: String
+  name: String
+  rankOrder: Int
+  displayMode: DisplayMode
+  transactions: [TransactionsByDay]
+}
+
+type CashGroup {
+  id: String
+  name: String
+  groupType: GroupType
+  rankOrder: Int
+  displayMode: DisplayMode
+  cashEntryRow: [CashEntryRow]
+}
+
+type InfoProjectType {
+  projectName: String
+  startingBalance: String
+  timezone: String
+  currency: String
+  initialCashFlow: String
+  startDate: String
+  weekSchedule: String
+  currencySymbol: String
+}
+
+type FetchProject {
+  ownerActiveSubscription: String
+  ownerSubscriptionExpiresAt: String
+  infoProject: InfoProjectType
+  cashGroup: [[CashGroup]]
+  permission: String
+}
+
+type GroupIdAndName {
+  id: String
+  name: String
+}
+
+type ListFilteredGroups {
+  in: [GroupIdAndName]
+  out: [GroupIdAndName]
+}
+
+type GroupsByType {
+  groupsByType: [GroupIdAndName]
+}
+
+type FilteredGroups {
+  filteredGroups: ListFilteredGroups
+}
+
+type CashEntryRowInGroup {
+  id: String
+  projectId: String
+  ownerId: String
+  cashGroupId: String
+  name: String
+  rankOrder: Int
+  displayMode: DisplayMode
+}
+
+type Plan {
+  id: String
+  planId: String
+  name: String
+  recurring: Recurring
+  price: Float
+  currency: String
+  description: String
+  discount: Float
+}
+
+type PaidSubscription {
+  id: String
+  subId: String
+  planId: String
+  userId: String
+}
+
+type IdAndEmail {
+  id: String
+  email: String
+}
+
+type ISharingProject {
+  id: String
+  ownerId: String
+  name: String
+  startingBalance: Float
+  timezone: String
+  currency: String
+  initialCashFlow: String
+  startDate: String
+  weekSchedule: Int
+  permission: String
+  ownerEmail: String
+  ownerLastName: String
+  ownerFirstName: String
+}
+
+type InfoOfAuthorizedUsers {
+  userId: String
+  lastName: String
+  firstName: String
+  email: String
+  permission: String
+}
+
+type IListProjectsWithSharedUsers {
+  id: String
+  ownerId: String
+  name: String
+  startingBalance: Float
+  timezone: String
+  currency: String
+  initialCashFlow: String
+  startDate: String
+  weekSchedule: Int
+  ownerEmail: String
+  ownerLastName: String
+  ownerFirstName: String
+  sharedWith: [InfoOfAuthorizedUsers]
+}
+
+type IListProjects {
+  ownerActiveSubscription: String
+  ownerSubscriptionExpiresAt: String
+  projects: [IListProjectsWithSharedUsers]
+  sharingProjects: [ISharingProject]
+}
+
+# query
+type Query {
+  getUser: GetUser
+  fetchProject(projectId: String): FetchProject
+  listProjects: IListProjects
+  getProjectInfo(projectId: String): CashProject
+  listGroups(projectId: String): FilteredGroups
+  listGroupsByType(listGroupsByType: ListGroupsByTypeInput): GroupsByType
+
+  listEntryRowsInGroup(
+    listEntryRowInGroupArgs: ListEntryRowInGroupInput
+  ): [CashEntryRowInGroup]
+
+  listTransactionsInRowInDay(
+    getAllTransactionsInRowInDay: GetAllTransactionsInRowInDayArgs
+  ): [Transaction]
+
+  listInfoOfAuthorizedUsersWithProject(
+    projectId: String
+  ): [[InfoOfAuthorizedUsers]]
+
+  getPlan(id: String): Plan
+  listPlans: [Plan]
+  getSubscription(id: String): PaidSubscription
+  listSubscriptions: [PaidSubscription]
+}
+
+# mutation
+type Mutation {
+  updateUserProfile(
+    firstName: String
+    lastName: String
+    timezone: String
+    currency: String
+  ): UpdateProfileResult
+
+  changePassword(
+    updatePasswordArgs: UpdatePasswordInput
+  ): MessageWhenChangePassword
+
+  isLinkResetPasswordExpired(token: String): Boolean
+
+  startFreeTrialPlan: String
+
+  createOrUpdateCashProject(
+    upsertProjectArgs: UpsertCashProjectInput
+  ): UpsertResult
+
+  deleteCashProject(projectId: String): DeletedInfo
+
+  createOrUpdateCashGroup(upsertGroupArgs: UpsertCashGroupInput): UpsertResult
+
+  createOrUpdateCashEntryRow(
+    upsertEntryRowArgs: UpsertCashEntryRowInput
+  ): UpsertResult
+
+  storeRankAfterDragDrop(listRowIds: [String]): ResultOfDragDrop
+
+  deleteCashEntryRow(deleteRowArgs: DeleteCashEntryRowInput): DeletedInfo
+
+  deleteCashGroup(deleteGroupArgs: DeleteCashGroupInput): DeletedInfo
+
+  createOrUpdateCashEntry(
+    upsertTransactionArgs: UpsertCashTransactionInput
+  ): UpsertResult
+
+  deleteCashTransaction(
+    deleteTransactionArgs: DeleteCashTransactionInput
+  ): DeletedInfo
+
+  invite(invitationArgs: InvitationInput): [IdAndEmail]
+
+  updatePermission(sharingArgs: SharingInput): UpsertResult
+
+  listEntryRowsInGroup(
+    listEntryRowInGroupArgs: ListEntryRowInGroupInput
+  ): [CashEntryRowInGroup]
+
+  deleteRecord(userIdAndProjectId: UserIdAndProjectId): DeletedInfo
+
+  registerSubscription(planId: String, token: String): String
+}

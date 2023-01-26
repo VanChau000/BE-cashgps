@@ -1,0 +1,26 @@
+name: Deploy CashGPS staging
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  FLYWAY_BASELINE_ON_MIGRATE: true
+
+jobs:
+  deploy:
+    name: Deploy CashGPS staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --build-arg BUILD_NUMBER=${{github.run_number}}  --config fly/staging.toml
+      - run: echo "${{ secrets.SSL_CERT_CA }}" | base64 --decode > root.crt
+      - uses: joshuaavalon/flyway-action@v2
+        with:
+          url: jdbc:postgresql://cashgps-staging-do-user-12488039-0.b.db.ondigitalocean.com:25060/cashgps?ssl=true&sslrootcert=root.crt
+          user: doadmin
+          password: ${{ secrets.MYSQL_PWD }}
+          locations: filesystem:src/migrations/
+      - run: echo 'Migration ran on CashGPS staging.'

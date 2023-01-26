@@ -1,0 +1,36 @@
+name: 'Run testing SQL migrations with Flyway on pull request'
+on:
+  pull_request:
+    branches-ignore:
+      - prod
+      - staging
+  push:
+    branches-ignore:
+      - prod
+      - staging
+
+jobs:
+  test:
+    name: 'Run testing SQL migrations with Flyway'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: joshuaavalon/flyway-action@v2
+        with:
+          url: jdbc:postgresql://postgres:5432/db
+          user: user
+          password: password
+          locations: src/migrations/sql
+      - run: echo 'SQL Migrations ran successfully'
